@@ -1,0 +1,213 @@
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Scanner;
+import java.util.Set;
+
+public class App {
+
+	public static String first_collection;
+	public static String second_collection;
+	
+	Identifiers a = new Identifiers();
+	Identifiers b = new Identifiers();
+	
+	CollectionsOfIdentifiers collection1 = new CollectionsOfIdentifiers();
+	CollectionsOfIdentifiers collection2 = new CollectionsOfIdentifiers();
+	
+	String identifiers = null;
+	
+	List<String> list1 = new ArrayList<String>();
+	List<String> list2 = new ArrayList<String>();
+
+	public String input1() {
+		Scanner user_input = new Scanner(System.in);
+		System.out.print("Give the first collection: ");
+		first_collection = user_input.nextLine();
+		return first_collection;
+	}
+	
+	public String input2() {
+		Scanner user_input = new Scanner(System.in);
+		System.out.print("Give the second collection: ");
+		second_collection = user_input.nextLine();
+		return second_collection;
+	}
+
+	public void brackets(String input) throws MyOwnException {
+		char f_bracket = input.charAt(0);
+		char l_bracket = input.charAt(input.length() - 1);
+		System.out.println(input);
+		System.out.println(input.length());
+		if (f_bracket == '{' && l_bracket == '}') {
+			System.out.println("Brackets right!");
+			input = removeCharAt(input, 0);
+		}
+		if (f_bracket == '{' && l_bracket != '}') {
+			throw new MyOwnException("missing '}'");
+		}
+		if (f_bracket != '{' && l_bracket == '}') {
+			throw new MyOwnException("missing '{'");
+		}		
+		else {
+			throw new MyOwnException("Brackets missing!");
+		}
+	}
+	
+	public void requirements(String input, Identifiers identifier, CollectionsOfIdentifiers collection){
+		
+		int teller = 0;
+		int value1=0;
+		
+		for (int i = 0; i < input.length(); i++) {
+			
+			if (Character.isLetterOrDigit(input.charAt(i)) && teller > 0){
+				System.out.println("alphanum");
+				identifier.addChar(input.charAt(i));
+				teller = teller + 1;
+			}
+			else if (Character.isLetter(input.charAt(i)) && teller == 0){
+				System.out.println("first letter correct");
+				identifier.addChar(input.charAt(i));
+				teller = teller + 1;
+			}
+			else if (Character.isWhitespace(input.charAt(i)) && teller == 0){
+				System.out.println("space after space");
+				break;
+			}
+			
+			else if (input.charAt(i) == '{'){
+				continue;
+		}
+			else if(collection.length() > 5){
+				System.out.println("too much identifiers");
+				break;
+			}
+			else if (Character.isWhitespace(input.charAt(i)) || input.charAt(i) == '}'){
+				System.out.println("char space");
+				identifiers = identifier.charToString();
+				collection.addIdentifier(identifiers);
+				System.out.println(identifiers);
+				identifier.empty();
+				teller = 0;
+			}
+			else{
+				System.out.println("One of the identifiers is not correct");
+				break;
+			}
+			
+		}
+	}
+	public String builder(List<String> input){
+			StringBuilder sb = new StringBuilder();
+				for (String s : input)
+					{
+						sb.append(s);
+						sb.append(" ");
+						}
+						sb.insert(0, "{");
+						sb.replace(sb.length()-1, sb.length(), "}");
+
+						return sb.toString();
+	}
+	
+	public <T>List<T> difference(List<T> list1, List<T> list2) {
+	        List<T> list = new ArrayList<T>();
+	        
+	        for (T t : list1) {
+	        	list.add(t);
+	            if(list2.contains(t)) {
+	                list.remove(t);
+	            }
+	        }
+	
+	        return list;
+	    }
+	public <T> List<T> union(List<T> list1, List<T> list2) {
+	    Set<T> set = new HashSet<T>();
+	
+	    set.addAll(list1);
+	    set.addAll(list2);
+	
+	    return new ArrayList<T>(set);
+	}
+
+	public <T> List<T> intersection(List<T> list1, List<T> list2) {
+	    List<T> list = new ArrayList<T>();
+	
+	    for (T t : list1) {
+	        if(list2.contains(t)) {
+	            list.add(t);
+	        }
+	    }
+	
+	    return list;
+	}
+
+
+	public <T> List<T> symmetric_difference(List<T> list1, List<T> list2) {
+		Set<T> set = new HashSet<T>();
+
+    	set.addAll(list1);
+    	set.addAll(list2);
+    	for (T t : list1) {
+    		if(list2.contains(t)) {
+    			set.remove(t);
+    		}
+    	}
+
+    	return new ArrayList<T>(set);
+	}
+	
+	public static String removeCharAt(String s, int pos) {
+		return s.substring(0, pos) + s.substring(pos + 1);
+	}
+
+
+	public void start() throws MyOwnException {
+
+		new App().input1();
+		new App().input2();
+		
+		System.out.println(first_collection);
+		System.out.println(second_collection);
+		
+		new App().brackets(first_collection);
+		new App().brackets(second_collection);
+		
+		new App().requirements(first_collection, a, collection1);
+		new App().requirements(second_collection, b, collection2);
+		
+
+		List<String> dif = new App().difference(collection1.idlist, collection2.idlist);
+		List<String> inter = new App().intersection(collection1.idlist, collection2.idlist);
+        List<String> union = new App().union(collection1.idlist, collection2.idlist);
+        List<String> symdif = new App().symmetric_difference(collection1.idlist, collection2.idlist);
+        
+        String di = new App().builder(dif);
+        String is = new App().builder(inter);
+        String un = new App().builder(union);
+        String sd = new App().builder(symdif);
+        System.out.println("difference: " + di);
+        System.out.println("intersection: " + is);
+        System.out.println("union: " + un);
+        System.out.println("sym.dif: " + sd);
+        
+        throw new MyOwnException("Brackets missing!");
+        
+        
+	}
+
+	public static void main(String[] args) throws Exception {
+			
+			try{
+				new App().start();
+			}		
+			catch (MyOwnException e) {
+				System.out.println(e.getMessage());
+			}
+		
+	}
+
+
+}
